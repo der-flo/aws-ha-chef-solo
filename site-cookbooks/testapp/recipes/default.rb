@@ -32,3 +32,5 @@ nginx_site 'default' do
   enable false
 end
 nginx_site 'testapp'
+
+cookbook_file '/etc/init/chef-solo.conf'
