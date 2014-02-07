@@ -3,6 +3,9 @@
     "nginx": {
       "locked_version": "2.2.2"
     },
+    "testapp": {
+      "path": "./site-cookbooks/testapp"
+    },
     "apt": {
       "locked_version": "2.3.4"
     },

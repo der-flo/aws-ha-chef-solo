@@ -7,6 +7,19 @@
 # All rights reserved - Do Not Redistribute
 #
 
+timestamped_deploy '/var/www' do
+  repo 'https://github.com/der-flo/aws-ha-testapp.git'
+  restart_command 'touch tmp/restart.txt'
+  symlink_before_migrate.clear
+  shallow_clone true
+  keep_releases 3
+end
+
+cookbook_file '/etc/init/chef-solo.conf'
+
+
+################################################################################
+# NGINX
 node.set['nginx']['version'] = '1.4.4'
 node.set['nginx']['source']['version'] = '1.4.4'
 node.set['nginx']['passenger']['version'] = '4.0.37'
@@ -32,5 +45,3 @@ nginx_site 'default' do
   enable false
 end
 nginx_site 'testapp'
-
-cookbook_file '/etc/init/chef-solo.conf'
