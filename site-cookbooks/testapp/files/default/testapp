@@ -1,0 +1,8 @@
+charset utf-8;
+server {
+  listen 80;
+  server_name _;
+  root /var/www/public;
+  passenger_enabled on;
+  rails_env production;
+}
