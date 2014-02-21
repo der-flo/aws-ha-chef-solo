@@ -13,35 +13,48 @@ timestamped_deploy '/var/www' do
   symlink_before_migrate.clear
   shallow_clone true
   keep_releases 3
+  before_migrate do
+    bash 'bundle-install' do
+      cwd release_path
+      # http://chr4.org/blog/2013/07/31/chef-deploy-revision-and-capistrano-git-style/
+      code 'bundle install --deployment --path /var/www/shared/bundle'
+    end
+  end
 end
 
 cookbook_file '/etc/init/chef-solo.conf'
 
+################################################################################
+# EC2-AMI-Tools
+package 'unzip'
+
+zip_path = Chef::Config[:file_cache_path]
+zip_file = "#{zip_path}/ec2-ami-tools-1.4.0.9.zip"
+remote_file zip_file do
+  source 'http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools-1.4.0.9.zip'
+  backup false
+end
+
+bash 'unarchive_source' do
+  cwd  zip_path
+  code 'unzip ec2-ami-tools-1.4.0.9.zip -d /usr/local'
+  not_if { ::File.directory?('/usr/local/ec2-ami-tools-1.4.0.9') }
+end
 
 ################################################################################
-# NGINX
-node.set['nginx']['version'] = '1.4.4'
-node.set['nginx']['source']['version'] = '1.4.4'
-node.set['nginx']['passenger']['version'] = '4.0.37'
-node.set['nginx']['passenger']['root'] = "#{node['languages']['ruby']['gems_dir']}/gems/passenger-#{node['nginx']['passenger']['version']}"
-node.set['nginx']['source']['url']      = "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
-node.set['nginx']['source']['checksum'] = '0510af71adac4b90484ac8caf3b8bd519a0f7126250c2799554d7a751a2db388'
+# Amazon EC2 API Tools
+# http://aws.amazon.com/developertools/351
+package 'openjdk-7-jre'
 
-
-node.set['nginx']['init_style'] = 'upstart'
-
-node.set['nginx']['source']['modules']  = %w[
-                                           nginx::http_ssl_module
-                                           nginx::http_gzip_static_module
-                                           nginx::passenger
-                                         ]
-
-
-include_recipe 'nginx::source'
-#include_recipe 'nginx::passenger'
-
-cookbook_file "#{node['nginx']['dir']}/sites-available/testapp"
-nginx_site 'default' do
-  enable false
+zip_file = "#{zip_path}/ec2-api-tools-1.6.9.0.zip"
+remote_file zip_file do
+  source 'http://s3.amazonaws.com/ec2-downloads/ec2-api-tools-1.6.9.0.zip'
+  backup false
 end
-nginx_site 'testapp'
+
+bash 'unarchive_source' do
+  cwd  zip_path
+  code 'unzip ec2-api-tools-1.6.9.0.zip -d /usr/local'
+  not_if { ::File.directory?('/usr/local/ec2-api-tools-1.6.9.0') }
+end
+
