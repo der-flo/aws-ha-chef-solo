@@ -17,7 +17,8 @@ timestamped_deploy '/var/www' do
     bash 'bundle-install' do
       cwd release_path
       # http://chr4.org/blog/2013/07/31/chef-deploy-revision-and-capistrano-git-style/
-      code 'bundle install --deployment --path /var/www/shared/bundle'
+      # TODO?
+      code 'bundle install'# --deployment'# --path /var/www/shared/bundle'
     end
   end
 end
@@ -68,10 +69,11 @@ timestamped_deploy '/opt/cc-server' do
   shallow_clone true
   keep_releases 3
   before_migrate do
-    bash 'bundle-install' do
+    bash 'bundle-install-cc-server' do
       cwd release_path
       # http://chr4.org/blog/2013/07/31/chef-deploy-revision-and-capistrano-git-style/
-      code 'bundle install --deployment --path /opt/cc-server/shared/bundle'
+      # TODO?
+      code 'bundle install'# --deployment --path /opt/cc-server/shared/bundle'
     end
   end
 end
