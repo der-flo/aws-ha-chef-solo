@@ -7,6 +7,12 @@
 # All rights reserved - Do Not Redistribute
 #
 
+# TODO
+# Gem überschreibt /usr/local/bin/rake
+gem_package 'rake' do
+  options force: true
+end
+
 timestamped_deploy '/var/www' do
   repo 'https://github.com/der-flo/aws-ha-testapp.git'
   restart_command 'touch tmp/restart.txt'
@@ -61,31 +67,34 @@ end
 
 ################################################################################
 # CC-Server
-timestamped_deploy '/opt/cc-server' do
-  repo 'https://github.com/der-flo/aws-ha-cc-server.git'
-  # TODO: Funktioniert das?
-  # restart_command 'touch tmp/restart.txt'
-  symlink_before_migrate.clear
-  shallow_clone true
-  keep_releases 3
-  before_migrate do
-    bash 'bundle-install-cc-server' do
-      cwd release_path
-      # http://chr4.org/blog/2013/07/31/chef-deploy-revision-and-capistrano-git-style/
-      # TODO?
-      code 'bundle install'# --deployment --path /opt/cc-server/shared/bundle'
-    end
-  end
-end
-cookbook_file '/etc/init/cc-server.conf'
-service 'cc-server' do
-  provider Chef::Provider::Service::Upstart
-  supports status: false
-  action [:enable, :start]
-end
-cookbook_file '/etc/init/cc-server-worker.conf'
-service 'cc-server-worker' do
-  provider Chef::Provider::Service::Upstart
-  supports status: false
-  action [:enable, :start]
-end
+
+# TODO: Zur Fehlersuche auskommentiert
+
+# timestamped_deploy '/opt/cc-server' do
+#   repo 'https://github.com/der-flo/aws-ha-cc-server.git'
+#   # TODO: Funktioniert das?
+#   # restart_command 'touch tmp/restart.txt'
+#   symlink_before_migrate.clear
+#   shallow_clone true
+#   keep_releases 3
+#   before_migrate do
+#     bash 'bundle-install-cc-server' do
+#       cwd release_path
+#       # http://chr4.org/blog/2013/07/31/chef-deploy-revision-and-capistrano-git-style/
+#       # TODO?
+#       code 'bundle install'# --deployment --path /opt/cc-server/shared/bundle'
+#     end
+#   end
+# end
+# cookbook_file '/etc/init/cc-server.conf'
+# service 'cc-server' do
+#   provider Chef::Provider::Service::Upstart
+#   supports status: false
+#   action [:enable, :start]
+# end
+# cookbook_file '/etc/init/cc-server-worker.conf'
+# service 'cc-server-worker' do
+#   provider Chef::Provider::Service::Upstart
+#   supports status: false
+#   action [:enable, :start]
+# end
