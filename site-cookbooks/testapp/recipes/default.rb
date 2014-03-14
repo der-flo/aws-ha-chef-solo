@@ -9,9 +9,9 @@
 
 # TODO
 # Gem überschreibt /usr/local/bin/rake
-gem_package 'rake' do
-  options force: true
-end
+# gem_package 'rake' do
+#   options force: true
+# end
 
 timestamped_deploy '/var/www' do
   repo 'https://github.com/der-flo/aws-ha-testapp.git'
