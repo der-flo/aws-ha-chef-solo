@@ -29,6 +29,8 @@ node.set['nginx']['source']['modules']  = %w[
 
 include_recipe 'nginx::source'
 
+# TODO: node[:roles].include? 'web'
+
 cookbook_file "#{node['nginx']['dir']}/sites-available/testapp"
 nginx_site 'default' do
   enable false

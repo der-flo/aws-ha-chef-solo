@@ -7,7 +7,6 @@
 # All rights reserved - Do Not Redistribute
 #
 
-
 timestamped_deploy '/var/www' do
   repo 'https://github.com/der-flo/aws-ha-testapp.git'
   restart_command 'touch tmp/restart.txt'
@@ -62,16 +61,22 @@ end
 
 ################################################################################
 # CC-Server
-# TODO: Da fehlen die symlinks für log und tmp/pids
 timestamped_deploy '/opt/cc-server' do
   repo 'https://github.com/der-flo/aws-ha-cc-server.git'
   # TODO: Funktioniert das?
   # restart_command 'touch tmp/restart.txt'
 
   symlink_before_migrate.clear
-  create_dirs_before_symlink.clear
-  purge_before_symlink.clear
-  symlinks.clear
+  create_dirs_before_symlink %w{tmp}
+  purge_before_symlink %w{log tmp/pids}
+  symlinks("pids" => "tmp/pids", "log" => "log")
+
+  # http://docs.opscode.com/resource_deploy.html#callbacks
+  before_symlink do
+    # Diese Verzeichnisse werden leider nicht automatisch angelegt.
+    FileUtils.mkdir_p "#{new_resource.shared_path}/pids"
+    FileUtils.mkdir_p "#{new_resource.shared_path}/log"
+  end
 
   shallow_clone true
   keep_releases 3
@@ -94,3 +99,7 @@ service 'cc-server-worker' do
   supports status: false
   action [:enable, :start]
 end
+
+################################################################################
+require_recipe 'testapp::web'
+require_recipe 'testapp::worker'
